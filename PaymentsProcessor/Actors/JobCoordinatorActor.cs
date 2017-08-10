@@ -16,7 +16,8 @@ namespace PaymentsProcessor.Actors
         public JobCoordinatorActor()
         {
             _paymentWorker = Context.ActorOf(
-                Context.DI().Props<PaymentWorkerActor>().WithRouter(new RoundRobinPool(3)));
+                Context.DI().Props<PaymentWorkerActor>().
+                WithRouter(FromConfig.Instance), "PaymentWorkers");
 
             Receive<ProcessFileMessage>(
                 message =>
