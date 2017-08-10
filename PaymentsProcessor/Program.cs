@@ -26,6 +26,10 @@ namespace PaymentsProcessor
 
             IActorRef jobCoordinator = ActorSystem.ActorOf<JobCoordinatorActor>("JobCoordinator");
 
+            ActorSystem.ActorOf(ActorSystem.DI().Props<PaymentWorkerActor>(), "PaymentWorker1");
+            ActorSystem.ActorOf(ActorSystem.DI().Props<PaymentWorkerActor>(), "PaymentWorker2");
+            ActorSystem.ActorOf(ActorSystem.DI().Props<PaymentWorkerActor>(), "PaymentWorker3");
+
             var jobTime = Stopwatch.StartNew();
 
             jobCoordinator.Tell(new ProcessFileMessage("file1.csv"));
