@@ -73,6 +73,7 @@
     <Compile Include="Messages\PaymentSentMessage.cs" />
     <Compile Include="Messages\ProcessFileMessage.cs" />
     <Compile Include="Messages\SendPaymentMessage.cs" />
+    <Compile Include="PeakTimeDemoSimulator.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

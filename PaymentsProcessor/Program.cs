@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Threading.Tasks;
 using Akka.Actor;
 using Akka.DI.AutoFac;
@@ -26,15 +25,13 @@ namespace PaymentsProcessor
 
             IActorRef jobCoordinator = ActorSystem.ActorOf<JobCoordinatorActor>("JobCoordinator");
 
-            var jobTime = Stopwatch.StartNew();
+            PeakTimeDemoSimulator.StartDemo(stayPeakTimeForSeconds: 6);
 
             jobCoordinator.Tell(new ProcessFileMessage("file1.csv"));
 
             await ActorSystem.WhenTerminated;
 
-            jobTime.Stop();
-
-            Console.WriteLine($"Job completed in {jobTime.ElapsedMilliseconds}ms");
+            Console.WriteLine("Job complete");
             Console.ReadLine();
         }
 

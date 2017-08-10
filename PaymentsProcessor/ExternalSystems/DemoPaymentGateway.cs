@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 
 namespace PaymentsProcessor.ExternalSystems
 {
@@ -6,8 +7,18 @@ namespace PaymentsProcessor.ExternalSystems
     {
         public void Pay(int accountNumber, decimal amount)
         {
-            // Simulate communicating with external payment gateway
-            Thread.Sleep(200);
+            if (PeakTimeDemoSimulator.IsPeakHours && amount > 100)
+            {
+                Console.WriteLine(
+                    $"Account number {accountNumber} payment takes longer because is peak & > 100");
+
+                Thread.Sleep(2000);
+            }
+            else
+            {
+                // Simulate communicating with external payment gateway
+                Thread.Sleep(200);
+            }
         }
     }
 }
