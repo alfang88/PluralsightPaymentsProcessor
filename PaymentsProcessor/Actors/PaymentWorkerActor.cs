@@ -5,9 +5,10 @@ using PaymentsProcessor.Messages;
 
 namespace PaymentsProcessor.Actors
 {
-    internal class PaymentWorkerActor : ReceiveActor
+    internal class PaymentWorkerActor : ReceiveActor, IWithUnboundedStash
     {
         private readonly IPaymentGateway _paymentGateway;
+        public IStash Stash { get; set; }
 
         public PaymentWorkerActor(IPaymentGateway paymentGateway)
         {
@@ -18,10 +19,18 @@ namespace PaymentsProcessor.Actors
 
         private void SendPayment(SendPaymentMessage message)
         {
-            Console.WriteLine($"Sending payment for {message.FirstName} {message.LastName}");
-            _paymentGateway.Pay(message.AccountNumber, message.AmountDecimal);
+            if (message.AmountDecimal > 100 && PeakTimeDemoSimulator.IsPeakHours)
+            {
+                Console.WriteLine($"Stashing payment message for {message.FirstName} {message.LastName}");
 
-            Sender.Tell(new PaymentSentMessage(message.AccountNumber));
+                Stash.Stash();
+            }
+            else
+            {
+                Console.WriteLine($"Sending payment for {message.FirstName} {message.LastName}");
+                _paymentGateway.Pay(message.AccountNumber, message.AmountDecimal);
+                Sender.Tell(new PaymentSentMessage(message.AccountNumber));
+            }
         }
     }
 }
