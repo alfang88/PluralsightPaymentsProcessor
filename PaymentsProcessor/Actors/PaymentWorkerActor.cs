@@ -9,12 +9,22 @@ namespace PaymentsProcessor.Actors
     {
         private readonly IPaymentGateway _paymentGateway;
         public IStash Stash { get; set; }
+        private ICancelable _unstashSchedule;
 
         public PaymentWorkerActor(IPaymentGateway paymentGateway)
         {
             _paymentGateway = paymentGateway;
 
             Receive<SendPaymentMessage>(message => SendPayment(message));
+            Receive<ProcessStashedPaymentsMessage>(message => HandleUnstash());
+        }
+
+        private void HandleUnstash()
+        {
+            if (PeakTimeDemoSimulator.IsPeakHours)
+                return;
+            Console.WriteLine("Not in peak time. Unstashing...");
+            Stash.UnstashAll();
         }
 
         private void SendPayment(SendPaymentMessage message)
@@ -32,5 +42,24 @@ namespace PaymentsProcessor.Actors
                 Sender.Tell(new PaymentSentMessage(message.AccountNumber));
             }
         }
+
+        #region Lifecycle hooks
+
+        protected override void PreStart()
+        {
+            _unstashSchedule = Context.System.Scheduler.ScheduleTellRepeatedlyCancelable(
+                TimeSpan.FromSeconds(1),
+                TimeSpan.FromSeconds(1),
+                Self,
+                new ProcessStashedPaymentsMessage(),
+                Self);
+        }
+
+        protected override void PostStop()
+        {
+            _unstashSchedule.Cancel();
+        }
+
+        #endregion
     }
 }
