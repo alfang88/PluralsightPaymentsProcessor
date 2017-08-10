@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using Akka.Actor;
 using Akka.DI.Core;
+using Akka.Routing;
 using PaymentsProcessor.Messages;
 
 namespace PaymentsProcessor.Actors
@@ -15,7 +16,7 @@ namespace PaymentsProcessor.Actors
         public JobCoordinatorActor()
         {
             _paymentWorker = Context.ActorOf(
-                Context.DI().Props<PaymentWorkerActor>(), "PaymentWorker");
+                Context.DI().Props<PaymentWorkerActor>().WithRouter(new RoundRobinPool(3)));
 
             Receive<ProcessFileMessage>(
                 message =>
