@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Akka.Actor;
@@ -26,6 +27,8 @@ namespace PaymentsProcessor.Actors
             Receive<PaymentSentMessage>(
                 message =>
                 {
+                    Console.WriteLine($"Receipt {message.ReceiptReference} for account {message.AccountNumer}");
+
                     _numberOfRemainingPayments--;
 
                     var jobIsComplete = _numberOfRemainingPayments == 0;

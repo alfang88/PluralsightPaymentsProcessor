@@ -1,13 +1,23 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace PaymentsProcessor.ExternalSystems
 {
     class DemoPaymentGateway : IPaymentGateway
     {
-        public void Pay(int accountNumber, decimal amount)
+        public async Task<PaymentReceipt> Pay(int accountNumber, decimal amount)
         {
-            // Simulate communicating with external payment gateway
-            Thread.Sleep(200);
+            return await Task.Delay(2000)
+                .ContinueWith<PaymentReceipt>(
+                    task =>
+                    {
+                        return new PaymentReceipt()
+                        {
+                            AccountNumber = accountNumber,
+                            PaymentConfirmationReceipt = Guid.NewGuid().ToString()
+                        };
+                    });
         }
     }
 }

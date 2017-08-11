@@ -18,10 +18,9 @@ namespace PaymentsProcessor.Actors
 
         private void SendPayment(SendPaymentMessage message)
         {
-            Console.WriteLine($"Sending payment for {message.FirstName} {message.LastName}");
-            _paymentGateway.Pay(message.AccountNumber, message.AmountDecimal);
+            var result = _paymentGateway.Pay(message.AccountNumber, message.AmountDecimal).Result;
 
-            Sender.Tell(new PaymentSentMessage(message.AccountNumber));
+            Sender.Tell(new PaymentSentMessage(result.AccountNumber, result.PaymentConfirmationReceipt));
         }
     }
 }
