@@ -1,5 +1,4 @@
-﻿using System;
-using Akka.Actor;
+﻿using Akka.Actor;
 using PaymentsProcessor.ExternalSystems;
 using PaymentsProcessor.Messages;
 
@@ -13,14 +12,18 @@ namespace PaymentsProcessor.Actors
         {
             _paymentGateway = paymentGateway;
 
-            Receive<SendPaymentMessage>(message => SendPayment(message));
+            Receive<SendPaymentMessage>(message => HandleSendPayment(message));
+            Receive<PaymentReceipt>(message => HandlePaymentReceipt(message));
         }
 
-        private void SendPayment(SendPaymentMessage message)
+        private void HandlePaymentReceipt(PaymentReceipt message)
         {
-            var result = _paymentGateway.Pay(message.AccountNumber, message.AmountDecimal).Result;
+            Sender.Tell(new PaymentSentMessage(message.AccountNumber, message.PaymentConfirmationReceipt));
+        }
 
-            Sender.Tell(new PaymentSentMessage(result.AccountNumber, result.PaymentConfirmationReceipt));
+        private void HandleSendPayment(SendPaymentMessage message)
+        {
+            _paymentGateway.Pay(message.AccountNumber, message.AmountDecimal).PipeTo(Self, Sender);
         }
     }
 }
