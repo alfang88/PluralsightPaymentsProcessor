@@ -16,11 +16,13 @@ namespace PaymentsProcessor.Actors
             Receive<SendPaymentMessage>(message => SendPayment(message));
         }
 
-        private void SendPayment(SendPaymentMessage message)
+        private async void SendPayment(SendPaymentMessage message)
         {
-            var result = _paymentGateway.Pay(message.AccountNumber, message.AmountDecimal).Result;
+            var sender = Sender;
 
-            Sender.Tell(new PaymentSentMessage(result.AccountNumber, result.PaymentConfirmationReceipt));
+            var result = await _paymentGateway.Pay(message.AccountNumber, message.AmountDecimal);
+
+            sender.Tell(new PaymentSentMessage(result.AccountNumber, result.PaymentConfirmationReceipt));
         }
     }
 }
